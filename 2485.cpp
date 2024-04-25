@@ -2,11 +2,13 @@
 
 #include <iostream>
 #include <algorithm>
-#include <cstring>
 
 using namespace std;
 
-int gcd(int a, int b);
+int gcd(int num1, int num2);
+
+int tree[100000];
+int tree_distance[100000];
 
 int main()
 {
@@ -16,33 +18,35 @@ int main()
 
 	int N;
 	cin >> N;
-
-	int* arr = new int[N];
 	for (int i = 0; i < N; i++) {
-		cin >> arr[i];
+		cin >> tree[i];
 	}
 
-	sort(arr, arr + N);
+	sort(tree, tree + N);	// 가로수 위치 정렬
 
-	int gcd_num = 0, min = 1000000001;
-	for (int i = 0; i < N - 2; i++) {
-		gcd_num = gcd(arr[i + 2] - arr[i + 1], arr[i + 1] - arr[i]);
-		if (min > gcd_num)
-			min = gcd_num;
+	// 각 가로수의 간격 계산
+	for (int i = 0; i < N - 1; i++) {
+		tree_distance[i] = tree[i + 1] - tree[i];
 	}
 
-	cout << (arr[N - 1] - arr[0]) / min - 1 - (N - 2);
+	// 간격의 최대공약수
+	int gcd_final = tree_distance[0];
+	for (int i = 1; i < N - 1; i++) {
+		gcd_final = gcd(gcd_final, tree_distance[i]);
+	}
 
-	delete[] arr;
+	int count = 0;
+	for (int i = 0; i < N - 1; i++) {
+		count += tree_distance[i] / gcd_final - 1;
+	}
+
+	cout << count << '\n';
 
 	return 0;
 }
 
-int gcd(int a, int b)
+int gcd(int num1, int num2)
 {
-	int r = a % b;
-	if (r == 0)
-		return b;
-	else
-		return gcd(b, r);
+	if (num2 == 0) return num1;
+	return gcd(num2, num1 % num2);
 }
